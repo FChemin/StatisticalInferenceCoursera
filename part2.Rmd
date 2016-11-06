@@ -1,0 +1,58 @@
+---
+title: "Statistical Inference Course Project - Part 2"
+author: "FChemin"
+date: "November 3, 2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+In this project, we're going to analyze the ToothGrowth data in the R datasets package.
+
+## Loading the dataset and performing basic exploratory data analysis
+
+```{r}
+data <- ToothGrowth
+head(data)
+tail(data)
+str(data)
+
+plot(data$dose, data$len, xlab = "dose", ylab = "len", pch=19, col=data$supp)
+legend(x=0.5, y=34.5, legend = levels(data$supp), col = c(1,2), pch=19)
+```
+
+## Providing a basic summary of the data
+
+```{r}
+summary(data)
+```
+
+## Comparing tooth growth by supp and dose using confidence intervals and/or hypothesis tests
+
+First, we perform a t-test on the supp and check if p-value < 0.05 and if 0 is in the confidence interval:
+
+```{r}
+t_test_supp <- t.test(ToothGrowth$len[ToothGrowth$supp == "OJ"], ToothGrowth$len[ToothGrowth$supp == "VC"], paired = FALSE, var.equal = FALSE)
+
+t_test_supp
+```
+
+The p-value is equal to `r t_test_supp$p.value` and larger than 0.05, and the 95 percent confidence interval ranges from `r t_test_supp$conf.int[1]` to `r t_test_supp$conf.int[2]`. Zero is inside this interval so **we fail to reject the null hypothesis**.
+
+Then, we perform another t-test but this time on the dose variable:
+
+```{r}
+t_test_dose <- t.test(ToothGrowth$len[ToothGrowth$dose == 1], ToothGrowth$len[ToothGrowth$dose == 2], paired = FALSE, var.equal = TRUE)
+
+t_test_dose
+```
+
+The p-value is equal to `r format(t_test_dose$p.value, scientific=FALSE)` so that's really close to zero, and the 95 percent confidence interval ranges from `r t_test_dose$conf.int[1]` to `r t_test_dose$conf.int[2]`. Zero is not inside this interval so **we reject the null hypothesis**. 
+
+## Conclusions
+
+We conclude here that the supplement type has no effect on tooth growth but, the act of giving supplement and the dosage of it have clearly effects, particularly on the higher dosage. This is true if we assume a normal distribution of the means, that the sample is representative of the population, and dosage and supplement were given randomly.
